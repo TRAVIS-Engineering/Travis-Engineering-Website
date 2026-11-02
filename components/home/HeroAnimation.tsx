@@ -4,8 +4,8 @@ import { useEffect, useRef, useState } from 'react';
 import BASE_PATH from '@/lib/basePath';
 import styles from './Hero.module.css';
 
-const poster = `${BASE_PATH}/media/hero/orbit-poster.png`;
-const animation = `${BASE_PATH}/media/hero/orbit-alpha.webm`;
+const poster = `${BASE_PATH}/media/hero/orbit-poster-1080.png`;
+const animation = `${BASE_PATH}/media/hero/orbit-smooth-1080.webm`;
 
 export default function HeroAnimation() {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -133,11 +133,11 @@ export default function HeroAnimation() {
         <div ref={containerRef} className={styles.animation}>
             {/* Separate PNG also provides the no-JavaScript/reduced-motion fallback. */}
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={poster} width="1280" height="720"
+            <img src={poster} width="1920" height="1080"
                 alt="A drone scanning a contemporary building"
                 className={styles.visual} hidden={showVideo} fetchPriority="high" />
             <video ref={videoRef} id="hero-drone-animation" muted playsInline loop preload="auto"
-                width="1280" height="720" aria-hidden="true" tabIndex={-1}
+                width="1920" height="1080" aria-hidden="true" tabIndex={-1}
                 className={`${styles.visual} ${styles.video}`}
                 style={{ opacity: showVideo ? 1 : 0 }} />
             {showControl && (
