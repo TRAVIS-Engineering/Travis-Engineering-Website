@@ -62,22 +62,38 @@
     background: #fff;
 }
 
+.viewport {
+    container-type: inline-size;
+    overflow: clip;
+    padding: 4px;
+    scrollbar-width: none;
+}
+
+.viewport::-webkit-scrollbar { display: none; }
+
 .track {
     display: flex;
+    width: max-content;
+    animation: reviewScroll var(--review-duration) linear infinite;
+}
+
+.track[data-paused="true"] { animation-play-state: paused; }
+
+.group {
+    display: flex;
     gap: 1.25rem;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: 4px;
-    scrollbar-width: thin;
-    scrollbar-color: #b6cbd0 transparent;
-    list-style: none;
+    padding: 0 1.25rem 0 0;
     margin: 0;
-    padding: 4px 4px 1.25rem;
+    list-style: none;
+}
+
+@keyframes reviewScroll {
+    to { transform: translateX(-50%); }
 }
 
 .card {
-    flex: 0 0 calc((100% - 2.5rem) / 3);
+    flex: 0 0 auto;
+    width: calc((100cqw - 2.5rem) / 3);
     display: flex;
     flex-direction: column;
     min-width: 0;
@@ -85,8 +101,12 @@
     background: #fff;
     border: 1px solid #dce5e8;
     border-radius: var(--border-radius);
-    scroll-snap-align: start;
 }
+
+/* Keyboard users get a stationary, scrollable list with no duplicate stops. */
+.viewport:has(:focus-visible) { overflow-x: auto; }
+.viewport:has(:focus-visible) .track { animation: none; }
+.viewport:has(:focus-visible) .group[aria-hidden="true"] { display: none; }
 
 .cardTop {
     display: flex;
@@ -169,49 +189,25 @@
     text-underline-offset: 3px;
 }
 
-.controls {
+.pause {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-top: 0.75rem;
-}
-
-.hint {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--color-text-light);
-    font-size: 0.8rem;
-}
-
-.buttons {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.control {
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    border: 1px solid #b6cbd0;
-    border-radius: 50%;
-    color: var(--color-secondary);
+    gap: 0.4rem;
+    margin: 0.5rem 0 0 auto;
+    min-height: 44px;
+    padding: 0 0.5rem;
+    border: 0;
     background: transparent;
-    transition: color 150ms ease, background 150ms ease;
+    color: #64748b;
+    font-size: 0.75rem;
+    cursor: pointer;
 }
 
-.control:hover {
-    color: #fff;
-    background: #007c91;
-    border-color: #007c91;
-}
+.pause:hover { color: #007c91; }
 
 .allReviews:focus-visible,
 .authorLink:focus-visible,
-.control:focus-visible,
-.track:focus-visible {
+.pause:focus-visible {
     outline: 2px solid #007c91;
     outline-offset: 3px;
 }
@@ -229,19 +225,20 @@
 }
 
 @media (max-width: 1000px) {
-    .card { flex-basis: calc((100% - 1.25rem) / 2); }
+    .card { width: calc((100cqw - 1.25rem) / 2); }
 }
 
 @media (max-width: 640px) {
     .section { padding: 3.5rem 0; }
     .container { padding: 0 1.25rem; }
     .header { flex-direction: column; align-items: flex-start; gap: 1.5rem; margin-bottom: 1.75rem; }
-    .card { flex-basis: 88%; padding: 1.5rem; }
+    .card { width: 88cqw; padding: 1.5rem; }
     .quote { font-size: 1.05rem; }
-    .hint { max-width: 150px; }
-    .hint svg { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .allReviews, .control { transition: none; }
+    .allReviews { transition: none; }
+    .track { animation: none; }
+    .viewport { overflow-x: auto; }
+    .group[aria-hidden="true"], .pause { display: none; }
 }
