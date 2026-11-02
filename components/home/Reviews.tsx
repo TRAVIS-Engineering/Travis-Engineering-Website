@@ -17,7 +17,6 @@ export default function Reviews() {
     const trackRef = useRef<HTMLUListElement>(null);
     const inViewRef = useRef(false);
     const [playing, setPlaying] = useState(true);
-    const [hovering, setHovering] = useState(false);
     const [canSlide, setCanSlide] = useState(false);
     const reducedMotion = useSyncExternalStore(
         subscribeToMotionChange,
@@ -57,14 +56,14 @@ export default function Reviews() {
     }, []);
 
     useEffect(() => {
-        if (!canSlide || !playing || hovering || reducedMotion) return;
+        if (!canSlide || !playing || reducedMotion) return;
         const interval = window.setInterval(() => {
             if (inViewRef.current && !document.hidden) {
                 slide(1);
             }
-        }, 6500);
+        }, 5000);
         return () => window.clearInterval(interval);
-    }, [canSlide, playing, hovering, reducedMotion, slide]);
+    }, [canSlide, playing, reducedMotion, slide]);
 
     if (!googleReviews.reviews.length) return null;
 
@@ -80,8 +79,6 @@ export default function Reviews() {
             className={styles.section}
             aria-labelledby="reviews-title"
             aria-roledescription="carousel"
-            onMouseEnter={() => setHovering(true)}
-            onMouseLeave={() => setHovering(false)}
             onFocusCapture={(event) => {
                 if (!(event.target instanceof HTMLElement) || !event.target.closest('[data-review-rotation]')) {
                     setPlaying(false);
@@ -92,7 +89,7 @@ export default function Reviews() {
                 <div className={styles.header}>
                     <div>
                         <p className={styles.eyebrow}>CLIENT EXPERIENCES</p>
-                        <h2 id="reviews-title" className={styles.title}>What our clients say.</h2>
+                        <h2 id="reviews-title" className={styles.title}>What Our Clients Have To Say</h2>
                         <p className={styles.subtitle}>Selected Google reviews of our engineering services and training.</p>
                     </div>
                     <a className={styles.allReviews} href={googleReviews.url} target="_blank" rel="noopener noreferrer">
