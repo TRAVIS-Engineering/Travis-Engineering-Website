@@ -17,7 +17,7 @@ export function createHeroAlphaRenderer(canvas: HTMLCanvasElement) {
     const fragment = compile(gl.FRAGMENT_SHADER, `precision highp float;
         uniform sampler2D frame; varying vec2 uv;
         void main(){
-            vec2 p=vec2((uv.x*1279.+.5)/2560.,(uv.y*719.+.5)/720.);
+            vec2 p=vec2((uv.x*959.+.5)/1920.,(uv.y*539.+.5)/540.);
             vec3 rgb=texture2D(frame,p).rgb;
             float alpha=texture2D(frame,p+vec2(.5,0.)).r;
             gl_FragColor=vec4(rgb,clamp((alpha-.004)/.992,0.,1.));
@@ -38,7 +38,7 @@ export function createHeroAlphaRenderer(canvas: HTMLCanvasElement) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.uniform1i(gl.getUniformLocation(program, 'frame'), 0);
-    canvas.width = 1280; canvas.height = 720;
+    canvas.width = 960; canvas.height = 540;
     gl.viewport(0, 0, canvas.width, canvas.height);
     return {
         draw(video: HTMLVideoElement, verify = false) {

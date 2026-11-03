@@ -1,26 +1,31 @@
 # Homepage drone animation
 
-`components/home/HeroAnimation.tsx` plays the approved 24-second drone scan / 360° orbit. Assets live in `public/media/hero/` and are served with the static site on GitHub Pages. No model, API, or Spark connection is used at runtime.
+`components/home/HeroAnimation.tsx` plays the approved **aerial-v6-site** animation: improved frontage road, parking access and landscaping, with the full 20-second drone-capture-to-engineering sequence. Alex explicitly confirmed TRAVIS Engineering as the destination on 2026-11-02. Existing headline, description, navigation and CTA are unchanged.
 
-- `orbit-smooth-1080.webm`: VP9 alpha export rendered at 1920 × 1080, 24 fps, 24 seconds, CRF 24. Keep its full duration and transparent background.
-- `orbit-mask-720.mp4`: iPhone-compatible H.264 color/alpha atlas, 2560 × 720 encoded, 1280 × 720 reconstructed, 24 fps and the same complete 24-second animation. RGB is on the left, grayscale alpha on the right; this file must never be displayed directly. `heroAlphaRenderer.ts` composites it into a transparent WebGL canvas.
-- `orbit-poster-1080.png`: matching 1920 × 1080 transparent still, also used without JavaScript or with reduced motion.
-- `Hero.module.css` provides the stationary teal grid. The video and poster have no card, border, or opaque backdrop.
+## Public assets
 
-The video is kept visually hidden until a decoded frame passes a canvas alpha check **and** `play()` succeeds. The check requires transparent corners and some opaque building pixels; WebM MIME support alone is insufficient. Do not add a poster attribute to the video: the separate image prevents accidentally sampling a PNG instead of a decoded frame. If replacing the artwork, verify these sample assumptions against the new clip.
+Assets are copied into `public/media/hero/` and served by GitHub Pages. No model, API or Spark connection is used for playback; preview HTML is not embedded.
 
-An IntersectionObserver and page-visibility listener pause playback offscreen/in background tabs. Explicit pause persists through scrolling. Reduced-motion visitors see the poster and do not initially download the video; live preference changes also stop playback. iPhone/iPad browsers start with the packed H.264 path; other browsers try native WebM alpha first and switch to the packed path if its decoded alpha is unsupported. The reconstructed canvas is also checked for transparent corners and opaque content. Decode/graphics errors or a 20-second source-loading timeout retain the poster. Autoplay rejection retains the poster and exposes a Play animation button that retries synchronously inside the user gesture. Playback is requested before waiting for decoded frames, since iOS may defer decoding until playback starts. No opaque video is displayed.
+- `aerial-v6-site-alpha.webm`: exact supplied VP9 alpha video, 960×540, 24 fps, 480 frames, 20 seconds, silent; 6,873,152 bytes.
+- `aerial-v6-site-poster.png`: exact supplied 1280×720 transparent poster, 200,481 bytes. Used while loading, with reduced motion, without JavaScript, or when playback cannot render transparency.
+- `aerial-v6-site-mask-540.mp4`: derived iPhone-compatible H.264 RGB/alpha atlas, 1920×540 encoded and 960×540 reconstructed, same 20 seconds/24 fps, silent; 8,781,487 bytes. RGB left, grayscale alpha right. Never display this video directly; `heroAlphaRenderer.ts` reconstructs a transparent canvas. This is not the white-background review MP4.
 
-Publish through the existing `.github/workflows/deploy.yml` workflow (push to `main`). Before publishing, run targeted ESLint and `npm run build`, and check desktop/mobile playback, a full loop, manual and offscreen pause, reduced motion, and unsupported-alpha/autoplay/error fallback paths in a browser.
+Source handoff: `/home/foisey/Documents/drone-scan-hero/AERIAL-V6-HANDOFF.md`. The portable `aerial-v6-site-hero.html` is a visual/behavior reference only. Old orbit assets remain in git history and the original source directories; they are no longer shipped by the site.
 
-## Quality refinement
+## Layout and transparency
 
-The first integration enlarged a 960 × 540 CRF 38 export to as much as 1280 CSS pixels. Alex requested a less grainy result. The replacement is rendered directly from the scene at 1920 × 1080, rather than upscaled from the old video. Scan-point luminance variation was reduced from 35% to 6% and point coverage increased from 1.35 to 2.15 pixels at 1080p to reduce speckling. Building geometry, camera/drone motion, 24-second timing, and exact scene reset are unchanged. New asset filenames avoid stale cached copies.
+The stationary white/teal grid stays in `Hero.module.css`; no video card, border or opaque backdrop. Desktop artwork occupies the area beside the original copy. Mobile places it above the copy, with dedicated control space. All 480 decoded frames were measured: alpha greater than 8 occupies x=326..902 and y=7..512 within the 960×540 video. CSS centers and scales that full visible range so the drone, building and captions remain in view, including at 320px. No asset content is cropped. Re-measure if replacing the animation again.
 
-Quality source and reproducible renderer: `/home/foisey/Documents/travis-hero-quality-20261102/` on Spark; CPU rendering runs in the matching directory on foiseydesk. The original approved scene under `/home/foisey/Documents/drone-scan-hero/` is preserved. These directories are production sources only, never website runtime dependencies.
+As in the approved preview, verify actual decoded alpha before revealing motion, rather than trusting WebM MIME support. The existing stronger check requires transparent corners and opaque scene pixels. Do not add a video poster attribute, which could cause a PNG to be sampled instead of decoded video pixels. The poster is a separate image and remains visible until verified playback starts.
 
-## iPhone compatibility
+The prior iPhone fix is retained with the matching v6 asset. iPhone/iPad starts with packed H.264; other browsers try native WebM alpha first, then the packed path if necessary. The reconstructed canvas must also pass actual-alpha validation. Decode errors, unavailable graphics or a 20-second loading timeout preserve the poster. Blocked autoplay preserves the poster and offers a synchronous-gesture Play animation retry. Playback is requested before waiting for loadeddata to avoid mobile decoding stalls.
 
-The native VP9 alpha path can display only a poster in iPhone browsers because WebM codec support does not guarantee alpha decoding. The packed H.264 asset avoids that dependency while preserving the stationary grid and the approved animation. It is about 4.5 MB; iOS avoids downloading the larger WebM first. Rendering uses video-frame callbacks where available and stops them when paused, offscreen, or backgrounded. Reduced-motion visitors continue to see the transparent poster.
+Muted, inline, full-length continuous looping; accessible pause/play button; manual pause persists through scrolling. IntersectionObserver and document visibility pause playback offscreen/in background tabs. Reduced motion shows the poster and avoids initial video requests; changes to the preference are honored. Packed canvas frame callbacks stop when playback stops.
 
-The packed source is derived from the improved 1080p WebM using ffmpeg/libvpx-vp9 to preserve its alpha, Lanczos downsampling to 1280×720, an RGB/alpha horizontal stack, and libx264 CRF18 yuv420p with faststart. Source/export and QA: `/home/foisey/Documents/travis-hero-ios-20261102/` on Spark and the matching foiseydesk directory. iPhone device confirmation remains separate from desktop browser emulation.
+## Verification and publishing
+
+Push main through the existing `.github/workflows/deploy.yml` workflow. Run targeted ESLint and the production build. Browser checks cover Chromium and WebKit playback, full real-time loop, 320–1920px bounds/layout, actual alpha, pause/resume, offscreen/reduced motion, blocked-autoplay retry, media/graphics failures and no-JavaScript poster. Desktop engine/emulation checks do not constitute physical iPhone testing.
+
+Reproducible checks, asset hashes, decoded-frame bounds and screenshots: `/home/foisey/Documents/travis-hero-v6-20261102/`, with execution in the matching `/home/foiseydesk/Documents/` directory on `onarchy-pc`. Build/browser/ffmpeg work uses the desktop, not the shared Spark model host. Temporary QA servers bind only to ephemeral loopback ports and close after checks.
+
+The mobile atlas was generated from the exact delivery WebM with libvpx-vp9 alpha decoding, split RGB/alpha extraction and horizontal stacking, then libx264 CRF18/yuv420p/faststart. No resampling or animation timing changes.

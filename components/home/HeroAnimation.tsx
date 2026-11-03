@@ -5,9 +5,9 @@ import BASE_PATH from '@/lib/basePath';
 import { createHeroAlphaRenderer } from './heroAlphaRenderer';
 import styles from './Hero.module.css';
 
-const poster = `${BASE_PATH}/media/hero/orbit-poster-1080.png`;
-const webm = `${BASE_PATH}/media/hero/orbit-smooth-1080.webm`;
-const packed = `${BASE_PATH}/media/hero/orbit-mask-720.mp4`;
+const poster = `${BASE_PATH}/media/hero/aerial-v6-site-poster.png`;
+const webm = `${BASE_PATH}/media/hero/aerial-v6-site-alpha.webm`;
+const packed = `${BASE_PATH}/media/hero/aerial-v6-site-mask-540.mp4`;
 type View = 'poster' | 'video' | 'canvas';
 
 export default function HeroAnimation() {
@@ -116,9 +116,10 @@ export default function HeroAnimation() {
             if (disposed || failed || verified || video.readyState < 2) return;
             try {
                 if (mode === 'packed') {
-                    if (video.videoWidth !== 2560 || video.videoHeight !== 720) throw new Error('Invalid packed frame');
+                    if (video.videoWidth !== 1920 || video.videoHeight !== 540) throw new Error('Invalid packed frame');
                     renderer!.draw(video, true);
                 } else {
+                    // Like the approved preview, inspect decoded alpha rather than WebM MIME support.
                     // A video poster attribute could accidentally make this sample a PNG.
                     const probe = document.createElement('canvas');
                     probe.width = 32; probe.height = 18;
@@ -178,12 +179,12 @@ export default function HeroAnimation() {
     return (
         <div ref={containerRef} className={styles.animation}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={poster} width="1920" height="1080" alt="A drone scanning a contemporary building"
+            <img src={poster} width="1280" height="720" alt="A drone surveying a warm architectural model with a frontage road, connected parking access and landscaped grounds"
                 className={styles.visual} hidden={view !== 'poster'} fetchPriority="high" />
             <video ref={videoRef} id="hero-drone-animation" muted playsInline loop preload="auto"
-                width="1920" height="1080" aria-hidden="true" tabIndex={-1}
+                width="960" height="540" aria-hidden="true" tabIndex={-1}
                 className={`${styles.visual} ${styles.video}`} style={{ opacity: view === 'video' ? 1 : 0 }} />
-            <canvas ref={canvasRef} id="hero-drone-canvas" width="1280" height="720" aria-hidden="true"
+            <canvas ref={canvasRef} id="hero-drone-canvas" width="960" height="540" aria-hidden="true"
                 className={styles.visual} style={{ opacity: view === 'canvas' ? 1 : 0 }} />
             {showControl && (
                 <button type="button" className={styles.motionControl}
