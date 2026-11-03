@@ -1,64 +1,43 @@
-/** Reconstruct transparency from an H.264 frame: RGB on the left, alpha on the right. */
+/** Reconstruct transparency from an H.264 frame: RGB left, alpha right.
+ * Canvas 2D avoids WebKit texture-upload/context loss at video loop boundaries.
+ */
 export function createHeroAlphaRenderer(canvas: HTMLCanvasElement) {
-    const gl = canvas.getContext('webgl', { alpha: true, premultipliedAlpha: false, preserveDrawingBuffer: true });
-    if (!gl) throw new Error('WebGL unavailable');
-    const compile = (type: number, source: string) => {
-        const shader = gl.createShader(type)!;
-        gl.shaderSource(shader, source);
-        gl.compileShader(shader);
-        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-            gl.deleteShader(shader);
-            throw new Error('Hero shader unavailable');
-        }
-        return shader;
-    };
-    const vertex = compile(gl.VERTEX_SHADER, `attribute vec2 position; varying vec2 uv;
-        void main(){gl_Position=vec4(position,0.,1.);uv=vec2((position.x+1.)*.5,(1.-position.y)*.5);}`);
-    const fragment = compile(gl.FRAGMENT_SHADER, `precision highp float;
-        uniform sampler2D frame; varying vec2 uv;
-        void main(){
-            vec2 p=vec2((uv.x*959.+.5)/1920.,(uv.y*539.+.5)/540.);
-            vec3 rgb=texture2D(frame,p).rgb;
-            float alpha=texture2D(frame,p+vec2(.5,0.)).r;
-            gl_FragColor=vec4(rgb,clamp((alpha-.004)/.992,0.,1.));
-        }`);
-    const program = gl.createProgram()!;
-    gl.attachShader(program, vertex); gl.attachShader(program, fragment); gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error('Hero shader unavailable');
-    gl.useProgram(program);
-    const buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
-    const position = gl.getAttribLocation(program, 'position');
-    gl.enableVertexAttribArray(position); gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
-    const texture = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.uniform1i(gl.getUniformLocation(program, 'frame'), 0);
-    canvas.width = 960; canvas.height = 540;
-    gl.viewport(0, 0, canvas.width, canvas.height);
+    const width = 960, height = 540;
+    canvas.width = width; canvas.height = height;
+    const output = canvas.getContext('2d', { alpha: true });
+    const source = document.createElement('canvas');
+    source.width = width * 2; source.height = height;
+    const input = source.getContext('2d', { willReadFrequently: true });
+    if (!input || !output) throw new Error('Hero canvas unavailable');
+    const frame = output.createImageData(width, height);
     return {
         draw(video: HTMLVideoElement, verify = false) {
-            if (gl.isContextLost()) throw new Error('Hero graphics context lost');
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, video);
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-            if (gl.getError() !== gl.NO_ERROR) throw new Error('Hero frame unavailable');
+            input.drawImage(video, 0, 0, source.width, source.height);
+            const packed = input.getImageData(0, 0, source.width, source.height).data;
+            const pixels = frame.data;
+            for (let y = 0; y < height; y++) {
+                const row = y * width * 8;
+                for (let x = 0; x < width; x++) {
+                    const src = row + x * 4, dst = (y * width + x) * 4;
+                    pixels[dst] = packed[src];
+                    pixels[dst + 1] = packed[src + 1];
+                    pixels[dst + 2] = packed[src + 2];
+                    // Remove near-black codec noise while retaining antialiased edges.
+                    pixels[dst + 3] = (packed[src + width * 4] - 1) / .992;
+                }
+            }
             if (verify) {
-                // Verify the reconstructed canvas, not just MP4 codec support.
-                const pixels = new Uint8Array(canvas.width * canvas.height * 4);
-                gl.readPixels(0, 0, canvas.width, canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
-                const corners = [0, canvas.width-1, (canvas.height-1)*canvas.width, canvas.width*canvas.height-1];
-                if (!corners.every(i => pixels[i*4+3] < 16) || !pixels.some((v,i) => i%4===3 && v>240)) {
+                const corners = [0, width - 1, (height - 1) * width, width * height - 1];
+                if (!corners.every(i => pixels[i * 4 + 3] < 16) ||
+                    !pixels.some((v, i) => i % 4 === 3 && v > 240)) {
                     throw new Error('Hero transparency unavailable');
                 }
             }
+            output.putImageData(frame, 0, 0);
         },
         dispose() {
-            gl.deleteTexture(texture); gl.deleteBuffer(buffer); gl.deleteProgram(program);
-            gl.deleteShader(vertex); gl.deleteShader(fragment);
+            source.width = source.height = 0;
+            output.clearRect(0, 0, width, height);
         },
     };
 }

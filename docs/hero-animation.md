@@ -8,7 +8,7 @@ Assets are copied into `public/media/hero/` and served by GitHub Pages. No model
 
 - `aerial-v6-site-alpha.webm`: exact supplied VP9 alpha video, 960×540, 24 fps, 480 frames, 20 seconds, silent; 6,873,152 bytes.
 - `aerial-v6-site-poster.png`: exact supplied 1280×720 transparent poster, 200,481 bytes. Used while loading, with reduced motion, without JavaScript, or when playback cannot render transparency.
-- `aerial-v6-site-mask-540.mp4`: derived iPhone-compatible H.264 RGB/alpha atlas, 1920×540 encoded and 960×540 reconstructed, same 20 seconds/24 fps, silent; 8,781,487 bytes. RGB left, grayscale alpha right. Never display this video directly; `heroAlphaRenderer.ts` reconstructs a transparent canvas. This is not the white-background review MP4.
+- `aerial-v6-site-mask-540.mp4`: derived iPhone-compatible H.264 RGB/alpha atlas, 1920×540 encoded and 960×540 reconstructed, same 20 seconds/24 fps, silent; 8,781,487 bytes. RGB left, grayscale alpha right. Never display this video directly; `heroAlphaRenderer.ts` reconstructs a transparent Canvas 2D image, avoiding WebKit WebGL context loss at loop boundaries. This is not the white-background review MP4.
 
 Source handoff: `/home/foisey/Documents/drone-scan-hero/AERIAL-V6-HANDOFF.md`. The portable `aerial-v6-site-hero.html` is a visual/behavior reference only. Old orbit assets remain in git history and the original source directories; they are no longer shipped by the site.
 
@@ -18,13 +18,13 @@ The stationary white/teal grid stays in `Hero.module.css`; no video card, border
 
 As in the approved preview, verify actual decoded alpha before revealing motion, rather than trusting WebM MIME support. The existing stronger check requires transparent corners and opaque scene pixels. Do not add a video poster attribute, which could cause a PNG to be sampled instead of decoded video pixels. The poster is a separate image and remains visible until verified playback starts.
 
-The prior iPhone fix is retained with the matching v6 asset. iPhone/iPad starts with packed H.264; other browsers try native WebM alpha first, then the packed path if necessary. The reconstructed canvas must also pass actual-alpha validation. Decode errors, unavailable graphics or a 20-second loading timeout preserve the poster. Blocked autoplay preserves the poster and offers a synchronous-gesture Play animation retry. Playback is requested before waiting for loadeddata to avoid mobile decoding stalls.
+The prior iPhone fix is retained with the matching v6 asset. iPhone/iPad starts with packed H.264; other browsers try native WebM alpha first, then the packed path if necessary. The reconstructed canvas must also pass actual-alpha validation. Decode errors, unavailable Canvas 2D or a 20-second loading timeout preserve the poster. Blocked autoplay preserves the poster and offers a synchronous-gesture Play animation retry. Playback is requested before waiting for loadeddata to avoid mobile decoding stalls.
 
 Muted, inline, full-length continuous looping; accessible pause/play button; manual pause persists through scrolling. IntersectionObserver and document visibility pause playback offscreen/in background tabs. Reduced motion shows the poster and avoids initial video requests; changes to the preference are honored. Packed canvas frame callbacks stop when playback stops.
 
 ## Verification and publishing
 
-Push main through the existing `.github/workflows/deploy.yml` workflow. Run targeted ESLint and the production build. Browser checks cover Chromium and WebKit playback, full real-time loop, 320–1920px bounds/layout, actual alpha, pause/resume, offscreen/reduced motion, blocked-autoplay retry, media/graphics failures and no-JavaScript poster. Desktop engine/emulation checks do not constitute physical iPhone testing.
+Push main through the existing `.github/workflows/deploy.yml` workflow. Run targeted ESLint and the production build. Browser checks cover Chromium and WebKit playback, full real-time loop, 320–1920px bounds/layout, actual alpha, pause/resume, offscreen/reduced motion, blocked-autoplay retry, media/canvas failures and no-JavaScript poster. Desktop engine/emulation checks do not constitute physical iPhone testing.
 
 Reproducible checks, asset hashes, decoded-frame bounds and screenshots: `/home/foisey/Documents/travis-hero-v6-20261102/`, with execution in the matching `/home/foiseydesk/Documents/` directory on `onarchy-pc`. Build/browser/ffmpeg work uses the desktop, not the shared Spark model host. Temporary QA servers bind only to ephemeral loopback ports and close after checks.
 

@@ -142,7 +142,6 @@ export default function HeroAnimation() {
             }
         }
         function onMotionChange(event: MediaQueryListEvent) { reduce = event.matches; syncPlayback(); }
-        function contextLost(event: Event) { event.preventDefault(); still(); }
         toggleRef.current = () => {
             if (blocked) { blocked = false; userPaused = false; }
             else userPaused = !userPaused;
@@ -155,7 +154,6 @@ export default function HeroAnimation() {
         video.addEventListener('pause', stopFrames);
         video.addEventListener('seeked', onSeeked);
         video.addEventListener('error', sourceFailed);
-        canvas.addEventListener('webglcontextlost', contextLost);
         reducedMotion.addEventListener('change', onMotionChange);
         document.addEventListener('visibilitychange', syncPlayback);
         const observer = new IntersectionObserver(([entry]) => {
@@ -171,7 +169,6 @@ export default function HeroAnimation() {
             video.removeEventListener('pause', stopFrames);
             video.removeEventListener('seeked', onSeeked);
             video.removeEventListener('error', sourceFailed);
-            canvas.removeEventListener('webglcontextlost', contextLost);
             video.pause(); renderer?.dispose(); toggleRef.current = () => {};
         };
     }, []);
