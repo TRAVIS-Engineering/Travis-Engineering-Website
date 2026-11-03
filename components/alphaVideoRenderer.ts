@@ -2,13 +2,13 @@
  * Canvas 2D avoids WebKit texture-upload/context loss at video loop boundaries.
  */
 export function createHeroAlphaRenderer(canvas: HTMLCanvasElement) {
-    const width = 960, height = 540;
+    const width = 1280, height = 720;
     canvas.width = width; canvas.height = height;
     const output = canvas.getContext('2d', { alpha: true });
     const source = document.createElement('canvas');
     source.width = width * 2; source.height = height;
     const input = source.getContext('2d', { willReadFrequently: true });
-    if (!input || !output) throw new Error('Hero canvas unavailable');
+    if (!input || !output) throw new Error('Animation canvas unavailable');
     const frame = output.createImageData(width, height);
     return {
         draw(video: HTMLVideoElement, verify = false) {
@@ -30,7 +30,7 @@ export function createHeroAlphaRenderer(canvas: HTMLCanvasElement) {
                 const corners = [0, width - 1, (height - 1) * width, width * height - 1];
                 if (!corners.every(i => pixels[i * 4 + 3] < 16) ||
                     !pixels.some((v, i) => i % 4 === 3 && v > 240)) {
-                    throw new Error('Hero transparency unavailable');
+                    throw new Error('Animation transparency unavailable');
                 }
             }
             output.putImageData(frame, 0, 0);

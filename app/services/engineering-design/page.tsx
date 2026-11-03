@@ -2,7 +2,8 @@ import Header from '@/components/home/Header';
 import Contact from '@/components/home/Contact';
 import Footer from '@/components/home/Footer';
 import BackToHomeButton from '@/components/BackToHomeButton';
-import DesignPdfSlideshow from '@/components/DesignPdfSlideshow';
+import TransparentAnimation from '@/components/TransparentAnimation';
+import { designAnimation } from '@/data/animations';
 import styles from './engineering-design.module.css';
 
 const capabilities = [
@@ -20,7 +21,7 @@ export default function EngineeringDesignPage() {
       <section className={styles.page}>
         <div className={styles.container}>
           <BackToHomeButton />
-          <div className={styles.grid}>
+          <div className={`${styles.grid} ${styles.animatedGrid}`}>
             <div>
               <h1 className={styles.title}>Engineering Design Services</h1>
               <p className={styles.copy}>
@@ -42,7 +43,7 @@ export default function EngineeringDesignPage() {
 
             <div>
               <div className={styles.capabilitiesTitle}>Design Services</div>
-              <DesignPdfSlideshow />
+              <TransparentAnimation key={designAnimation.id} animation={designAnimation} />
             </div>
           </div>
         </div>

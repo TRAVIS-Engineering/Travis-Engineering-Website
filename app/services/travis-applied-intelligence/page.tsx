@@ -2,7 +2,8 @@ import Header from '@/components/home/Header';
 import Contact from '@/components/home/Contact';
 import Footer from '@/components/home/Footer';
 import BackToHomeButton from '@/components/BackToHomeButton';
-import BASE_PATH from '@/lib/basePath';
+import TransparentAnimation from '@/components/TransparentAnimation';
+import { intelligenceAnimation } from '@/data/animations';
 import styles from '../engineering-design/engineering-design.module.css';
 
 const capabilities = [
@@ -21,7 +22,7 @@ export default function TravisAppliedIntelligencePage() {
       <section className={styles.page}>
         <div className={styles.container}>
           <BackToHomeButton />
-          <div className={styles.grid}>
+          <div className={`${styles.grid} ${styles.animatedGrid}`}>
             <div>
               <h1 className={styles.title}>Travis Applied Intelligence</h1>
               <p className={styles.copy}>
@@ -45,17 +46,7 @@ export default function TravisAppliedIntelligencePage() {
             </div>
 
             <div>
-              <div
-                className={styles.viewerWrap}
-                style={{ minHeight: 500, alignItems: 'stretch' }}
-              >
-                <img
-                  src={`${BASE_PATH}/images/travis-ai-drone-inspection-report.jpg`}
-                  alt="Travis AI drone inspection report"
-                  className={styles.viewerImage}
-                  style={{ objectFit: 'cover', objectPosition: 'center' }}
-                />
-              </div>
+              <TransparentAnimation key={intelligenceAnimation.id} animation={intelligenceAnimation} />
             </div>
           </div>
         </div>

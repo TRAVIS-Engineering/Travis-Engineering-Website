@@ -1,0 +1,82 @@
+[
+  {
+    "id": "aerial-v7-van",
+    "seconds": 20,
+    "fps": 24,
+    "mobileMasterSha256": "08753dbbb6cc2a7c86b44bc2e5205eb395ce86b58da35aa854f0cd4d188094a9",
+    "files": {
+      "aerial-v7-van-alpha.webm": {
+        "bytes": 6884626,
+        "sha256": "a9858829e7e0276af4d2df131528cf940e1b78a5d91591dd3da0e01cca4d5c52"
+      },
+      "aerial-v7-van-poster.png": {
+        "bytes": 202557,
+        "sha256": "8cf72a802bd297ffce346638d03aa0a04e59248fb85a13ab2ee60005ca6bd30b"
+      },
+      "aerial-v7-van-mask-720.mp4": {
+        "bytes": 16832912,
+        "sha256": "54136a70365303478770c2181071cd99c56fedab9a13f1e12360010bbc250b22"
+      }
+    }
+  },
+  {
+    "id": "services-intelligence",
+    "seconds": 20,
+    "fps": 24,
+    "mobileMasterSha256": "874bb3966e8e91a00a71f99a17a65ecc139f922fd7e17263db9b56ff76ea5f08",
+    "files": {
+      "services-intelligence-alpha.webm": {
+        "bytes": 3303279,
+        "sha256": "1aaac3a08302683d4a7a318ff91246f95cceef0e01c6852137499e4048ed90da"
+      },
+      "services-intelligence-poster.png": {
+        "bytes": 185287,
+        "sha256": "1f928a4f34b093c51b4d128cdfcb13af3443452ec857e106a2d5479f31e0ad42"
+      },
+      "services-intelligence-mask-720.mp4": {
+        "bytes": 4666354,
+        "sha256": "f5f74df3a4932b530617629ed306a22373f0f376e69b7e4db5606036cdc45bac"
+      }
+    }
+  },
+  {
+    "id": "services-design",
+    "seconds": 28,
+    "fps": 24,
+    "mobileMasterSha256": "404a76149f6fdbdbd252891e9c6753f211abde66cd7d4dc8ae43e3de23e58308",
+    "files": {
+      "services-design-alpha.webm": {
+        "bytes": 1456063,
+        "sha256": "d4c29f5f15cf57f07e61cc63e44657eaeade9def5c08102535d610640131cfbb"
+      },
+      "services-design-poster.png": {
+        "bytes": 130482,
+        "sha256": "34146ac07370807ec042ce3a9cbd3291192ecb254553ca58d9b129c43ddbaaf7"
+      },
+      "services-design-mask-720.mp4": {
+        "bytes": 2005926,
+        "sha256": "91b16069eda9e143b8b4dc4983a3028869382951ac94e207f02a3b602cd07eb1"
+      }
+    }
+  },
+  {
+    "id": "services-damage",
+    "seconds": 24,
+    "fps": 24,
+    "mobileMasterSha256": "54f8a55962d746661f782a9c45d0c29b9e6e4dce3b2d14f40778856aca8b84c0",
+    "files": {
+      "services-damage-alpha.webm": {
+        "bytes": 2530343,
+        "sha256": "7765cd6ea0e1ccf650f5120365a0489ac77708cbc6f6816a2dcde2b13b41c163"
+      },
+      "services-damage-poster.png": {
+        "bytes": 121548,
+        "sha256": "b981fa97293629ae95b522a6e6ec88a47be785bc0147ae88f3de0581d690db32"
+      },
+      "services-damage-mask-720.mp4": {
+        "bytes": 3610066,
+        "sha256": "ddf37ca402174a194ecba3ce2f812509fc462177f057534991e281b83b14f9f2"
+      }
+    }
+  }
+]

@@ -2,7 +2,8 @@ import Header from '@/components/home/Header';
 import Contact from '@/components/home/Contact';
 import Footer from '@/components/home/Footer';
 import BackToHomeButton from '@/components/BackToHomeButton';
-import DamagePdfSlideshow from '@/components/DamagePdfSlideshow';
+import TransparentAnimation from '@/components/TransparentAnimation';
+import { damageAnimation } from '@/data/animations';
 import styles from '../engineering-design/engineering-design.module.css';
 
 const capabilities = [
@@ -20,7 +21,7 @@ export default function DamageAssessmentsPage() {
       <section className={styles.page}>
         <div className={styles.container}>
           <BackToHomeButton />
-          <div className={styles.grid}>
+          <div className={`${styles.grid} ${styles.animatedGrid}`}>
             <div>
               <h1 className={styles.title}>Damage Assessments</h1>
               <p className={styles.copy}>
@@ -41,7 +42,7 @@ export default function DamageAssessmentsPage() {
 
             <div>
               <div className={styles.capabilitiesTitle}>Sample Damage Assessment</div>
-              <DamagePdfSlideshow />
+              <TransparentAnimation key={damageAnimation.id} animation={damageAnimation} />
             </div>
           </div>
         </div>
