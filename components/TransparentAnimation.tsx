@@ -136,7 +136,12 @@ export default function TransparentAnimation({ animation, priority = false, clas
                 setShowControl(!reduce); reveal();
             } catch { sourceFailed(); }
         }
-        function onPlaying() { checkFrame(); reveal(); }
+        function onPlaying() {
+            // WebKit may resume a visible video independently after a pause event.
+            // Reapply user/visibility preferences to every platform-initiated start.
+            if (!shouldPlay()) { stopFrames(); video.pause(); return; }
+            checkFrame(); reveal();
+        }
         function onSeeked() {
             checkFrame();
             if (verified && mode === 'packed') {
